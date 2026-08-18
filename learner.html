@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Your Trading Journey · 7tics</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --paper:#EFE6D6; --paper2:#FAF4E8; --card:#FBF6EC;
+    --ink:#17293D; --ink-soft:#5D6E7E; --line:#DCCFB6;
+    --amber:#CE8418; --amber-soft:#F0C468; --sage:#4F9E82; --brick:#C36B4E;
+    --r:16px;
+    --display:'Space Grotesk',system-ui,sans-serif;
+    --body:'IBM Plex Sans',system-ui,sans-serif;
+    --mono:'IBM Plex Mono',ui-monospace,monospace;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0; background:var(--paper); color:var(--ink);
+    font-family:var(--body); line-height:1.6;
+    background-image:radial-gradient(circle at 1px 1px, rgba(23,41,61,.05) 1px, transparent 0);
+    background-size:22px 22px;
+  }
+  .wrap{max-width:820px; margin:0 auto; padding:36px 22px 80px}
+
+  /* masthead */
+  .eyebrow{font-family:var(--mono); font-size:12px; letter-spacing:.26em; text-transform:uppercase; color:var(--amber); margin:0 0 10px}
+  h1{font-family:var(--display); font-weight:700; font-size:clamp(30px,6vw,46px); line-height:1.03; margin:0 0 12px; letter-spacing:-.015em}
+  .intro{color:var(--ink-soft); font-size:16px; max-width:52ch; margin:0}
+  .intro b{color:var(--ink); font-weight:600}
+
+  /* you are here hero */
+  .here{margin:26px 0 8px; background:var(--card); border:1px solid var(--line); border-radius:var(--r);
+    padding:22px 24px; box-shadow:0 18px 40px -30px rgba(23,41,61,.5)}
+  .here .kick{font-family:var(--mono); font-size:11px; letter-spacing:.22em; text-transform:uppercase; color:var(--amber)}
+  .here .ch-of{font-family:var(--mono); font-size:12px; color:var(--ink-soft); float:right}
+  .here h2{font-family:var(--display); font-weight:600; font-size:clamp(22px,4vw,30px); margin:6px 0 8px; letter-spacing:-.01em}
+  .here p{margin:0 0 4px; font-size:15.5px}
+  .here .todo{margin-top:12px; font-family:var(--mono); font-size:12.5px; color:var(--sage)}
+  .here .todo.none{color:var(--ink-soft)}
+
+  /* journey */
+  .journey{margin:20px 0 6px; background:var(--paper2); border:1px solid var(--line); border-radius:var(--r); padding:16px 8px 8px}
+  .journey h3{font-family:var(--mono); font-size:11px; letter-spacing:.22em; text-transform:uppercase; color:var(--ink-soft); margin:0 14px 2px}
+  .journey svg{display:block; width:100%; height:auto}
+  .n-label{font-family:var(--mono); font-size:12px; fill:var(--ink-soft)}
+  .n-label.on{fill:var(--ink); font-weight:500}
+  .here-tag{font-family:var(--mono); font-size:10px; fill:var(--amber)}
+  @media (prefers-reduced-motion:no-preference){ .ping{animation:ping 2.6s ease-in-out infinite} }
+  @keyframes ping{0%,100%{r:9px}50%{r:12px}}
+
+  /* mantras */
+  .mantras{margin:22px 0 6px}
+  .mantras .m-label{font-family:var(--mono); font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:var(--ink-soft); margin:0 0 10px}
+  .mantras ul{list-style:none; margin:0; padding:0; display:grid; grid-template-columns:1fr 1fr; gap:9px}
+  .mantras li{background:var(--card); border:1px solid var(--line); border-left:3px solid var(--amber); border-radius:10px; padding:11px 14px; font-size:14px; font-weight:500}
+
+  /* chapters */
+  .chapters{margin-top:24px; display:flex; flex-direction:column; gap:12px}
+  .ch{background:var(--card); border:1px solid var(--line); border-radius:var(--r); overflow:hidden}
+  .ch.done{opacity:.82}
+  .ch.current{border-color:var(--amber); box-shadow:0 0 0 1px rgba(206,132,24,.25)}
+  .ch-head{display:flex; align-items:center; gap:14px; padding:15px 18px; cursor:pointer; user-select:none}
+  .ch-dot{width:34px;height:34px;flex:0 0 34px;border-radius:50%; display:grid; place-items:center; font-family:var(--mono); font-size:12px; border:1.5px solid var(--line); color:var(--ink-soft); background:var(--paper2)}
+  .ch.current .ch-dot{border-color:var(--amber); color:var(--amber)}
+  .ch.done .ch-dot{border-color:var(--sage); color:#fff; background:var(--sage)}
+  .ch-meta{flex:1; min-width:0}
+  .ch-title{font-family:var(--display); font-weight:600; font-size:18px; margin:0; letter-spacing:-.01em}
+  .ch-sub{font-family:var(--mono); font-size:11px; color:var(--ink-soft); margin-top:2px}
+  .ch-badge{font-family:var(--mono); font-size:10px; letter-spacing:.1em; text-transform:uppercase; padding:4px 9px; border-radius:999px; border:1px solid var(--line); color:var(--ink-soft); white-space:nowrap}
+  .ch-badge.current{border-color:var(--amber); color:var(--amber)}
+  .ch-badge.done{border-color:var(--sage); color:var(--sage)}
+  .caret{color:var(--ink-soft); transition:transform .2s}
+  .ch.open .caret{transform:rotate(90deg)}
+
+  .ch-body{display:none; padding:2px 18px 20px; border-top:1px solid var(--line)}
+  .ch.open .ch-body{display:block}
+  .learn{color:var(--ink-soft); font-size:14.5px; margin:14px 0 16px; padding-left:12px; border-left:2px solid var(--amber-soft)}
+  .focus-label{font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink); margin:0 0 8px}
+  ul.todo{list-style:none; padding:0; margin:0 0 16px}
+  ul.todo li{display:flex; gap:11px; align-items:flex-start; padding:7px 0}
+  ul.todo input{appearance:none;-webkit-appearance:none; margin:2px 0 0; width:20px;height:20px;flex:0 0 20px; border:1.5px solid var(--line); border-radius:6px; cursor:pointer; background:var(--paper2); position:relative; transition:.15s}
+  ul.todo input:checked{background:var(--sage); border-color:var(--sage)}
+  ul.todo input:checked::after{content:"✓"; position:absolute; inset:0; display:grid; place-items:center; color:#fff; font-size:13px; font-weight:700}
+  ul.todo label{font-size:14.5px; cursor:pointer}
+  ul.todo input:checked + label{color:var(--ink-soft); text-decoration:line-through; text-decoration-color:var(--sage)}
+
+  .levelup{display:flex; gap:12px; align-items:flex-start; background:linear-gradient(180deg,rgba(206,132,24,.09),rgba(206,132,24,.03)); border:1px solid var(--amber-soft); border-radius:12px; padding:13px 15px}
+  .levelup .lk{font-size:18px; line-height:1.2}
+  .levelup .lu-kick{font-family:var(--mono); font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--amber); display:block; margin-bottom:3px}
+  .levelup .lu-text{font-size:14px}
+  .levelup .lu-note{color:var(--ink-soft); font-size:12.5px; margin-top:5px; font-style:italic}
+
+  /* milestones */
+  .miles{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:26px}
+  .mile{background:var(--card); border:1px solid var(--line); border-radius:var(--r); padding:16px 18px}
+  .mile .ml-label{font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-soft)}
+  .mile .ml-val{font-family:var(--mono); font-size:28px; font-weight:500; margin:6px 0 2px}
+  .mile .ml-val b{color:var(--amber)}
+  .mile.hit .ml-val b{color:var(--sage)}
+  .mile .ml-note{font-size:12.5px; color:var(--ink-soft)}
+  .mile .ml-note.hit{color:var(--sage)}
+  .stepper{display:flex; gap:8px; margin-top:12px}
+  .stepper button{font-family:var(--mono); font-size:16px; width:38px;height:38px; border-radius:10px; border:1px solid var(--line); background:var(--paper2); color:var(--ink); cursor:pointer; transition:.15s}
+  .stepper button:hover{border-color:var(--amber); color:var(--amber)}
+  .minibar{height:6px; border-radius:5px; background:#e6dcc6; margin-top:12px; overflow:hidden; border:1px solid var(--line)}
+  .minibar > i{display:block; height:100%; width:0; background:var(--amber); transition:width .4s}
+  .mile.hit .minibar > i{background:var(--sage)}
+
+  .pep{margin-top:26px; background:var(--paper2); border:1px dashed var(--line); border-radius:var(--r); padding:18px 20px; text-align:center}
+  .pep p{margin:0; font-size:15px; color:var(--ink)}
+  .pep b{color:var(--amber)}
+
+  footer{margin-top:26px; display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap}
+  footer p{font-family:var(--mono); font-size:12px; color:var(--ink-soft); margin:0}
+  .reset{font-family:var(--mono); font-size:11px; letter-spacing:.08em; text-transform:uppercase; background:none; border:1px solid var(--line); color:var(--ink-soft); border-radius:8px; padding:8px 12px; cursor:pointer}
+  .reset:hover{border-color:var(--brick); color:var(--brick)}
+
+  :focus-visible{outline:2px solid var(--amber); outline-offset:2px; border-radius:4px}
+  @media (max-width:600px){ .mantras ul{grid-template-columns:1fr} .miles{grid-template-columns:1fr} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <p class="eyebrow">7tics · my learning journal</p>
+  <h1>Your Trading<br />Journey</h1>
+  <p class="intro">One patient step at a time. You don't need to be fast — you need to <b>show up and keep a record</b>. This is slow on purpose, and that's exactly how real skill is built.</p>
+
+  <section class="here" id="here" aria-live="polite"></section>
+
+  <section class="journey" aria-label="Your journey so far">
+    <h3>Your journey — 7 chapters</h3>
+    <svg id="journeySvg" viewBox="0 0 700 190" role="img" aria-label="Your path through the seven chapters"></svg>
+  </section>
+
+  <section class="mantras">
+    <p class="m-label">Say these to yourself</p>
+    <ul id="mantras"></ul>
+  </section>
+
+  <main class="chapters" id="chapters"></main>
+
+  <section class="miles" id="miles"></section>
+
+  <section class="pep">
+    <p><b>Remember:</b> a good day isn't a winning trade — it's a trade where you followed your plan. Protect the account, log everything, stay patient. You're doing it right.</p>
+  </section>
+
+  <footer>
+    <p>Your progress saves on this device.</p>
+    <button class="reset" id="resetBtn">Start fresh</button>
+  </footer>
+
+</div>
+
+<script>
+const DATA = {
+  mantras:[
+    "Ask myself first, then learn.",
+    "Protect the account before chasing profit.",
+    "A good trade is one I planned — win or lose.",
+    "Always know my real costs.",
+    "Slow is the plan, not a problem.",
+    "My journal is my proof."
+  ],
+  miles:[
+    {id:"trades", label:"Trades in my journal", target:40, note:"Every logged trade is a data point. At 40 we can finally ask: does this really work?"},
+    {id:"passes", label:"Demo challenges passed", target:2, note:"Pass the demo twice before real money. Twice means it wasn't luck."}
+  ],
+  chapters:[
+    {
+      title:"Unlearning the myths", when:"Weeks 1–3",
+      learn:"Clear out what social media taught you and see what trading actually is: a small edge, managed carefully. No magic, no gurus, no get-rich-quick.",
+      tasks:[
+        "Write down everything you currently believe about trading (we'll look back at this later).",
+        "Talk it through together — you answer the questions first, before any explanation."
+      ],
+      gate:"You can explain, in your own words, that trading is running a small edge while carefully managing risk — not predicting the future."
+    },
+    {
+      title:"Meeting the market", when:"Weeks 4–7",
+      learn:"Get hands-on with the demo from day one. Learn what you're actually trading and how it moves — by clicking buttons, not reading theory.",
+      tasks:[
+        "Open the demo and place small practice orders: market, limit, stop.",
+        "Watch funding tick; feel leverage and margin.",
+        "Liquidate a tiny position on purpose — see exactly where an account dies.",
+        "Add up the real cost of one round-trip: spread, fees, funding, slippage."
+      ],
+      gate:"You can place any order type, explain funding and liquidation in your own words, and read the true cost of a trade off your own fills."
+    },
+    {
+      title:"Protecting the money first", when:"Weeks 8–11",
+      learn:"Before any strategy: learn to size trades so a losing streak can't wipe you out. This is the skill that keeps you in the game.",
+      tasks:[
+        "Build your own position-size calculator in a spreadsheet.",
+        "Start measuring every trade in R (risk units), not dollars.",
+        "Play with the blow-up simulator — see how risk-per-trade decides who survives.",
+        "Set your own rules: max risk per trade, max loss per day."
+      ],
+      gate:"You size any trade correctly without help, think in R by default, and can explain why sizing — not the setup — is what blows accounts up."
+    },
+    {
+      title:"Reading charts & keeping a journal", when:"Weeks 12–19",
+      learn:"Learn a few honest tools to read a chart, pick ONE setup, and write down every single trade. Your journal quietly becomes your proof.",
+      tasks:[
+        "Learn a small toolkit: structure, support/resistance, trend, one or two setups. No indicator soup.",
+        "Mark up live charts every day. Pick one setup and stick to it.",
+        "Trade it small on demo, many times. Journal every trade: screenshot, reason, R, feeling, result.",
+        "Before each trade, guess if it'll win and how confident you are.",
+        "After ~40–50 trades, work out your setup's win rate and average R together."
+      ],
+      gate:"You have 40+ journaled trades on your one setup, following your risk rules — and you can compute its win rate, average R and expectancy from your own journal."
+    },
+    {
+      title:"Testing if it really works", when:"Starts inside Chapter 4 · runs a while",
+      learn:"Take the setup you trade by feel and actually test it against history. Learn why a pretty backtest can lie — and how to catch it.",
+      tasks:[
+        "Backtest by hand first: scroll back through the chart and log every time your setup appeared.",
+        "Then use AI to build a proper backtest — and check its work, don't just trust it.",
+        "Hunt for the lies: too few trades, peeking at the future, over-fitting, ignoring costs.",
+        "Compare the backtest to your real demo results — study the gap."
+      ],
+      gate:"You can get a rule backtested (with AI's help), then name at least three ways the backtest might be lying — and check each one."
+    },
+    {
+      title:"The practice challenge", when:"Weeks 20–25",
+      learn:"Run a full challenge on the demo, under real rules, with fake money. Fail safely, learn exactly why, and go again.",
+      tasks:[
+        "Run a full challenge on demo: profit target, max drawdown, daily-loss limit.",
+        "Trade your one setup with your risk system and journal.",
+        "If you fail, diagnose it honestly — then run it again."
+      ],
+      gate:"You pass the demo challenge under full rules at least twice — so we know it wasn't luck — before any real money."
+    },
+    {
+      title:"The real challenge", when:"When you pass the demo, again and again",
+      learn:"The real Hypernova challenge — live and honest. You earned this seat by being ready, not by rushing. The learning keeps going.",
+      tasks:[
+        "Sit the real challenge only after passing the demo repeatably.",
+        "Be open about the referral — honesty is the whole brand.",
+        "Keep journaling. Keep improving your tested setup."
+      ],
+      gate:"You're trading the live challenge — steady, sized, and by your own plan. From here it's a craft, not a finish line."
+    }
+  ]
+};
+
+const KEY = "teaching_trading_learner_v1";
+const DEFAULT = { checks:{}, open:{} , miles:{trades:0, passes:0} };
+let state = load();
+
+function load(){
+  try{ const s=JSON.parse(localStorage.getItem(KEY)); if(s&&s.checks) return Object.assign({},DEFAULT,s); }catch(e){}
+  return JSON.parse(JSON.stringify(DEFAULT));
+}
+function save(){ localStorage.setItem(KEY, JSON.stringify(state)); }
+
+function chapterDone(i){
+  return DATA.chapters[i].tasks.every((_,t)=>state.checks["c"+i+"-t"+t]);
+}
+function currentChapter(){
+  for(let i=0;i<DATA.chapters.length;i++){ if(!chapterDone(i)) return i; }
+  return DATA.chapters.length; // all done
+}
+function chapterState(i){
+  const cur=currentChapter();
+  if(chapterDone(i)) return "done";
+  if(i===cur) return "current";
+  return "upcoming";
+}
+
+// keep exactly one chapter open by default (the current one) unless user overrides
+function ensureOpen(){
+  if(Object.keys(state.open).length===0){
+    const c=currentChapter(); state.open[Math.min(c,DATA.chapters.length-1)]=true;
+  }
+}
+
+function renderHere(){
+  const el=document.getElementById("here");
+  const cur=currentChapter();
+  const total=DATA.chapters.length;
+  if(cur>=total){
+    el.innerHTML=`<span class="kick">You did it</span><h2>Every chapter complete 🎉</h2>
+      <p>You've walked the whole path — myths to a live, tested edge. Now it's a craft you keep sharpening.</p>`;
+    return;
+  }
+  const ch=DATA.chapters[cur];
+  const left=ch.tasks.filter((_,t)=>!state.checks["c"+cur+"-t"+t]).length;
+  const todo = left===0
+    ? `<div class="todo none">All practice done — talk to your coach about levelling up.</div>`
+    : `<div class="todo">▸ ${left} thing${left>1?"s":""} to practise in this chapter</div>`;
+  el.innerHTML=`<span class="ch-of">Chapter ${cur+1} of ${total}</span>
+    <span class="kick">You are here</span>
+    <h2>${ch.title}</h2>
+    <p>${ch.learn}</p>${todo}`;
+}
+
+const NX=[50,158,266,374,482,590,656], NY=[158,146,128,102,90,56,34];
+function renderJourney(){
+  const svg=document.getElementById("journeySvg");
+  const pts=DATA.chapters.map((_,i)=>[NX[i],NY[i]]);
+  const cur=currentChapter();
+  const doneUpto = Math.min(cur, pts.length-1);
+  let h="";
+  h+=`<polyline points="${pts.map(p=>p.join(",")).join(" ")}" fill="none" stroke="#DCCFB6" stroke-width="3" stroke-linejoin="round"/>`;
+  const lit=pts.slice(0,Math.max(doneUpto+1,1));
+  if(lit.length>1) h+=`<polyline points="${lit.map(p=>p.join(",")).join(" ")}" fill="none" stroke="#CE8418" stroke-width="3" stroke-linejoin="round"/>`;
+  // home flag
+  h+=`<g transform="translate(656,34)"><line x1="0" y1="0" x2="0" y2="-22" stroke="#4F9E82" stroke-width="2"/><path d="M0,-22 L14,-17 L0,-12 Z" fill="#4F9E82"/></g>`;
+  DATA.chapters.forEach((c,i)=>{
+    const st=chapterState(i); const x=NX[i], y=NY[i];
+    const fill = st==="done" ? "#4F9E82" : (st==="current" ? "#CE8418" : "#FAF4E8");
+    const stroke = st==="done" ? "#4F9E82" : (st==="current" ? "#CE8418" : "#C9B89C");
+    const cls = st==="current" ? "ping" : "";
+    h+=`<circle class="${cls}" cx="${x}" cy="${y}" r="9" fill="${fill}" stroke="${stroke}" stroke-width="2"/>`;
+    if(st==="done") h+=`<path d="M${x-4},${y} l3,3 l5,-6" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`;
+    if(st==="current") h+=`<text class="here-tag" x="${x}" y="${y-16}" text-anchor="middle">you are here</text>`;
+    h+=`<text class="n-label ${st!=='upcoming'?'on':''}" x="${x}" y="${y+30}" text-anchor="middle">${i+1}</text>`;
+  });
+  svg.innerHTML=h;
+}
+
+function renderMantras(){
+  const ul=document.getElementById("mantras");
+  ul.innerHTML=DATA.mantras.map(m=>`<li>${m}</li>`).join("");
+}
+
+function renderChapters(){
+  const host=document.getElementById("chapters");
+  host.innerHTML="";
+  DATA.chapters.forEach((c,i)=>{
+    const st=chapterState(i);
+    const isOpen=!!state.open[i];
+    const card=document.createElement("section");
+    card.className="ch "+st+(isOpen?" open":"");
+    card.id="ch-"+i;
+    const badge = st==="current" ? `<span class="ch-badge current">you're here</span>`
+      : st==="done" ? `<span class="ch-badge done">done</span>`
+      : `<span class="ch-badge">coming up</span>`;
+    const dot = st==="done" ? "✓" : (i+1);
+    const tasks=c.tasks.map((t,ti)=>{
+      const id="c"+i+"-t"+ti; const on=!!state.checks[id];
+      return `<li><input type="checkbox" id="${id}" data-check="${id}" ${on?"checked":""}/><label for="${id}">${t}</label></li>`;
+    }).join("");
+    card.innerHTML=`
+      <div class="ch-head" data-toggle="${i}">
+        <div class="ch-dot">${dot}</div>
+        <div class="ch-meta">
+          <h3 class="ch-title">${c.title}</h3>
+          <div class="ch-sub">Chapter ${i+1} of ${DATA.chapters.length} · ${c.when}</div>
+        </div>
+        ${badge}
+        <span class="caret">▶</span>
+      </div>
+      <div class="ch-body">
+        <p class="learn">${c.learn}</p>
+        <p class="focus-label">Your focus — check off as you practise</p>
+        <ul class="todo">${tasks}</ul>
+        <div class="levelup">
+          <span class="lk">🔓</span>
+          <div><span class="lu-kick">You level up when you can</span>
+          <span class="lu-text">${c.gate}</span>
+          <div class="lu-note">Your coach confirms this milestone with you.</div></div>
+        </div>
+      </div>`;
+    host.appendChild(card);
+  });
+  host.querySelectorAll(".ch-head").forEach(head=>{
+    head.addEventListener("click", e=>{
+      if(e.target.closest("input,label,a")) return;
+      const i=+head.dataset.toggle; state.open[i]=!state.open[i]; save(); renderChapters();
+    });
+  });
+  host.querySelectorAll("input[data-check]").forEach(inp=>{
+    inp.addEventListener("change", ()=>{
+      state.checks[inp.dataset.check]=inp.checked; save();
+      renderHere(); renderJourney(); renderChapters();
+    });
+  });
+}
+
+function renderMiles(){
+  const host=document.getElementById("miles");
+  host.innerHTML="";
+  DATA.miles.forEach(m=>{
+    const val=state.miles[m.id]||0; const hit=val>=m.target;
+    const pct=Math.min(100,Math.round(val/m.target*100));
+    const d=document.createElement("div");
+    d.className="mile"+(hit?" hit":"");
+    d.innerHTML=`
+      <div class="ml-label">${m.label}</div>
+      <div class="ml-val"><b>${val}</b> <span style="color:var(--ink-soft)">/ ${m.target}</span></div>
+      <div class="ml-note ${hit?"hit":""}">${hit?"You hit the milestone — nicely done.":m.note}</div>
+      <div class="stepper"><button data-m="${m.id}" data-d="-1" aria-label="minus">−</button><button data-m="${m.id}" data-d="1" aria-label="plus">+</button></div>
+      <div class="minibar"><i style="width:${pct}%"></i></div>`;
+    host.appendChild(d);
+  });
+  host.querySelectorAll("button[data-m]").forEach(b=>{
+    b.addEventListener("click", ()=>{
+      const id=b.dataset.m, delta=+b.dataset.d;
+      state.miles[id]=Math.max(0,(state.miles[id]||0)+delta); save(); renderMiles();
+    });
+  });
+}
+
+document.getElementById("resetBtn").addEventListener("click", ()=>{
+  if(confirm("Start fresh? This clears your saved progress on this device.")){
+    state=JSON.parse(JSON.stringify(DEFAULT)); save();
+    ensureOpen(); renderHere(); renderJourney(); renderChapters(); renderMiles();
+  }
+});
+
+ensureOpen();
+renderHere();
+renderJourney();
+renderMantras();
+renderChapters();
+renderMiles();
+</script>
+</body>
+</html>

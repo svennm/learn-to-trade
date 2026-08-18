@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Learning to Trade · 7tics</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --ink:#0B1A2B; --ink2:#0F2135; --line:#213C56; --chalk:#E9F0F6; --muted:#88A2BB;
+    --amber:#F5B841; --paper:#EFE6D6; --sage:#4F9E82;
+  }
+  *{box-sizing:border-box}
+  body{margin:0; min-height:100vh; background:var(--ink); color:var(--chalk);
+    font-family:'IBM Plex Sans',system-ui,sans-serif;
+    background-image:linear-gradient(rgba(33,60,86,.16) 1px,transparent 1px),linear-gradient(90deg,rgba(33,60,86,.16) 1px,transparent 1px);
+    background-size:34px 34px;
+    display:flex; align-items:center; justify-content:center; padding:30px}
+  .hub{max-width:860px; width:100%}
+  .eyebrow{font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:.28em; text-transform:uppercase; color:var(--amber); margin:0 0 12px; text-align:center}
+  h1{font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(32px,6vw,54px); text-align:center; margin:0 0 8px; letter-spacing:-.015em}
+  .sub{text-align:center; color:var(--muted); max-width:44ch; margin:0 auto 38px; font-size:15px}
+  .doors{display:grid; grid-template-columns:1fr 1fr; gap:18px}
+  a.door{display:block; text-decoration:none; color:inherit; border:1px solid var(--line); border-radius:16px; padding:26px 24px; transition:.2s; position:relative; overflow:hidden}
+  a.door:hover{transform:translateY(-3px)}
+  .door .role{font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.2em; text-transform:uppercase; margin:0 0 10px}
+  .door h2{font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:24px; margin:0 0 8px}
+  .door p{margin:0 0 18px; font-size:13.5px; line-height:1.5}
+  .door .go{font-family:'IBM Plex Mono',monospace; font-size:13px; font-weight:500}
+
+  a.coach{background:linear-gradient(180deg,var(--ink2),rgba(15,33,53,.3))}
+  a.coach:hover{border-color:var(--amber); box-shadow:0 20px 50px -30px rgba(245,184,65,.6)}
+  a.coach .role{color:var(--amber)} a.coach p{color:var(--muted)} a.coach .go{color:var(--amber)}
+
+  a.learner{background:var(--paper); color:#17293D}
+  a.learner:hover{box-shadow:0 20px 50px -28px rgba(0,0,0,.7)}
+  a.learner .role{color:#CE8418} a.learner p{color:#5D6E7E} a.learner .go{color:#CE8418}
+
+  .foot{text-align:center; margin-top:30px; font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--muted)}
+  :focus-visible{outline:2px solid var(--amber); outline-offset:3px; border-radius:8px}
+  @media (max-width:560px){ .doors{grid-template-columns:1fr} }
+</style>
+</head>
+<body>
+  <div class="hub">
+    <p class="eyebrow">7tics</p>
+    <h1>Learning to Trade</h1>
+    <p class="sub">Two views of the same journey — from unlearning the myths to a real Hypernova challenge. Pick yours.</p>
+    <div class="doors">
+      <a class="door coach" href="coach.html">
+        <p class="role">For the coach</p>
+        <h2>Coach Console</h2>
+        <p>The full plan: phase gates, the Socratic question scripts, episode hooks and the honest timeline. Your instrument panel for teaching her.</p>
+        <span class="go">Open console →</span>
+      </a>
+      <a class="door learner" href="learner.html">
+        <p class="role">For the learner</p>
+        <h2>Her Journal</h2>
+        <p>Where she is, what to practise now, her mantras and milestones. Warm, honest, one patient step at a time — no spoilers.</p>
+        <span class="go">Open journal →</span>
+      </a>
+    </div>
+    <p class="foot">Progress saves separately in each view, on each device.</p>
+  </div>
+</body>
+</html>
