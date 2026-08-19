@@ -7,6 +7,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 <style>
   :root{
     --paper:#EFE6D6; --paper2:#FAF4E8; --card:#FBF6EC;
@@ -152,8 +155,8 @@
   </section>
 
   <footer>
-    <p>Your progress saves on this device.</p>
-    <button class="reset" id="resetBtn">Start fresh</button>
+    <p id="syncBadge" style="display:flex;align-items:center;gap:7px;font-family:var(--mono);font-size:12px;color:var(--ink-soft);margin:0"><span id="syncDot" style="width:8px;height:8px;border-radius:50%;background:#C9B89C;display:inline-block"></span><span id="syncText">connecting…</span></p>
+    <p style="font-family:var(--mono);font-size:12px;color:var(--ink-soft);margin:0">Shared live with your coach.</p>
   </footer>
 
 </div>
@@ -223,7 +226,8 @@ const DATA = {
         "Backtest by hand first: scroll back through the chart and log every time your setup appeared.",
         "Then use AI to build a proper backtest — and check its work, don't just trust it.",
         "Hunt for the lies: too few trades, peeking at the future, over-fitting, ignoring costs.",
-        "Compare the backtest to your real demo results — study the gap."
+        "Compare the backtest to your real demo results — study the gap.",
+        "Later, with your coach, move toward better tools and a little automation."
       ],
       gate:"You can get a rule backtested (with AI's help), then name at least three ways the backtest might be lying — and check each one."
     },
@@ -250,36 +254,54 @@ const DATA = {
   ]
 };
 
-const KEY = "teaching_trading_learner_v1";
-const DEFAULT = { checks:{}, open:{} , miles:{trades:0, passes:0} };
-let state = load();
+// ---- Firebase shared sync (multiplayer) ----
+const firebaseConfig = {
+  apiKey: "AIzaSyAeEyS179aCc4u82YaKJknqhaCOFznqaDA",
+  authDomain: "tradingmultiplayer.firebaseapp.com",
+  databaseURL: "https://tradingmultiplayer-default-rtdb.firebaseio.com",
+  projectId: "tradingmultiplayer",
+  storageBucket: "tradingmultiplayer.firebasestorage.app",
+  messagingSenderId: "688145836851",
+  appId: "1:688145836851:web:66ecc15effe1baec3a2c46",
+  measurementId: "G-CTL776GG7F"
+};
+const ROOM = "lt-tm-9f3a7c21";
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+const roomRef = db.ref("rooms/" + ROOM);
 
-function load(){
-  try{ const s=JSON.parse(localStorage.getItem(KEY)); if(s&&s.checks) return Object.assign({},DEFAULT,s); }catch(e){}
-  return JSON.parse(JSON.stringify(DEFAULT));
-}
-function save(){ localStorage.setItem(KEY, JSON.stringify(state)); }
+// shared (synced) + local-only UI (which chapter is open)
+let shared = { checks:{}, trackers:{trades:0, passes:0} };
+const UIKEY = "teaching_trading_learner_ui_v1";
+let openState = loadOpen();
+function loadOpen(){ try{ const o=JSON.parse(localStorage.getItem(UIKEY)); if(o) return o; }catch(e){} return {}; }
+function saveOpen(){ localStorage.setItem(UIKEY, JSON.stringify(openState)); }
 
-function chapterDone(i){
-  return DATA.chapters[i].tasks.every((_,t)=>state.checks["c"+i+"-t"+t]);
-}
-function currentChapter(){
-  for(let i=0;i<DATA.chapters.length;i++){ if(!chapterDone(i)) return i; }
-  return DATA.chapters.length; // all done
-}
+// keys match the coach console so progress is shared
+function taskKey(i,ti){ return "p"+i+"-t"+ti; }
+function taskChecked(i,ti){ return !!shared.checks[taskKey(i,ti)]; }
+function gateApproved(i){ return !!shared.checks["p"+i+"-gate"]; }
+
+// a chapter is "done" only when the coach approves its gate
+function chapterDone(i){ return gateApproved(i); }
+function currentChapter(){ for(let i=0;i<DATA.chapters.length;i++){ if(!gateApproved(i)) return i; } return DATA.chapters.length; }
 function chapterState(i){
   const cur=currentChapter();
-  if(chapterDone(i)) return "done";
+  if(gateApproved(i)) return "done";
   if(i===cur) return "current";
   return "upcoming";
 }
 
-// keep exactly one chapter open by default (the current one) unless user overrides
 function ensureOpen(){
-  if(Object.keys(state.open).length===0){
-    const c=currentChapter(); state.open[Math.min(c,DATA.chapters.length-1)]=true;
+  if(Object.keys(openState).length===0){
+    const c=Math.min(currentChapter(),DATA.chapters.length-1); openState[c]=true;
   }
 }
+function writeCheck(i,ti,val){ const k=taskKey(i,ti); shared.checks[k]=val; renderAll(); roomRef.child("checks/"+k).set(val); }
+function writeTracker(id,val){ shared.trackers[id]=val; renderAll(); roomRef.child("trackers/"+id).set(val); }
+function setSync(on){ const d=document.getElementById("syncDot"), t=document.getElementById("syncText"); if(!d) return; d.style.background=on?"#4F9E82":"#C36B4E"; t.textContent=on?"live · synced":"offline"; }
+
+function renderAll(){ ensureOpen(); renderHere(); renderJourney(); renderChapters(); renderMiles(); }
 
 function renderHere(){
   const el=document.getElementById("here");
@@ -291,9 +313,9 @@ function renderHere(){
     return;
   }
   const ch=DATA.chapters[cur];
-  const left=ch.tasks.filter((_,t)=>!state.checks["c"+cur+"-t"+t]).length;
+  const left=ch.tasks.filter((_,t)=>!taskChecked(cur,t)).length;
   const todo = left===0
-    ? `<div class="todo none">All practice done — talk to your coach about levelling up.</div>`
+    ? `<div class="todo none">All practice done — your coach will confirm when you level up.</div>`
     : `<div class="todo">▸ ${left} thing${left>1?"s":""} to practise in this chapter</div>`;
   el.innerHTML=`<span class="ch-of">Chapter ${cur+1} of ${total}</span>
     <span class="kick">You are here</span>
@@ -311,7 +333,6 @@ function renderJourney(){
   h+=`<polyline points="${pts.map(p=>p.join(",")).join(" ")}" fill="none" stroke="#DCCFB6" stroke-width="3" stroke-linejoin="round"/>`;
   const lit=pts.slice(0,Math.max(doneUpto+1,1));
   if(lit.length>1) h+=`<polyline points="${lit.map(p=>p.join(",")).join(" ")}" fill="none" stroke="#CE8418" stroke-width="3" stroke-linejoin="round"/>`;
-  // home flag
   h+=`<g transform="translate(656,34)"><line x1="0" y1="0" x2="0" y2="-22" stroke="#4F9E82" stroke-width="2"/><path d="M0,-22 L14,-17 L0,-12 Z" fill="#4F9E82"/></g>`;
   DATA.chapters.forEach((c,i)=>{
     const st=chapterState(i); const x=NX[i], y=NY[i];
@@ -336,7 +357,7 @@ function renderChapters(){
   host.innerHTML="";
   DATA.chapters.forEach((c,i)=>{
     const st=chapterState(i);
-    const isOpen=!!state.open[i];
+    const isOpen=!!openState[i];
     const card=document.createElement("section");
     card.className="ch "+st+(isOpen?" open":"");
     card.id="ch-"+i;
@@ -345,9 +366,23 @@ function renderChapters(){
       : `<span class="ch-badge">coming up</span>`;
     const dot = st==="done" ? "✓" : (i+1);
     const tasks=c.tasks.map((t,ti)=>{
-      const id="c"+i+"-t"+ti; const on=!!state.checks[id];
-      return `<li><input type="checkbox" id="${id}" data-check="${id}" ${on?"checked":""}/><label for="${id}">${t}</label></li>`;
+      const id="lt-"+i+"-"+ti; const on=taskChecked(i,ti);
+      return `<li><input type="checkbox" id="${id}" data-i="${i}" data-ti="${ti}" ${on?"checked":""}/><label for="${id}">${t}</label></li>`;
     }).join("");
+    const passed=gateApproved(i);
+    const levelup = passed
+      ? `<div class="levelup" style="border-color:#4F9E82;background:linear-gradient(180deg,rgba(79,158,130,.13),rgba(79,158,130,.04))">
+          <span class="lk">✅</span>
+          <div><span class="lu-kick" style="color:#4F9E82">Leveled up!</span>
+          <span class="lu-text">${c.gate}</span>
+          <div class="lu-note">Your coach confirmed this — nice work.</div></div>
+        </div>`
+      : `<div class="levelup">
+          <span class="lk">🔓</span>
+          <div><span class="lu-kick">You level up when you can</span>
+          <span class="lu-text">${c.gate}</span>
+          <div class="lu-note">Your coach confirms this milestone with you.</div></div>
+        </div>`;
     card.innerHTML=`
       <div class="ch-head" data-toggle="${i}">
         <div class="ch-dot">${dot}</div>
@@ -362,26 +397,18 @@ function renderChapters(){
         <p class="learn">${c.learn}</p>
         <p class="focus-label">Your focus — check off as you practise</p>
         <ul class="todo">${tasks}</ul>
-        <div class="levelup">
-          <span class="lk">🔓</span>
-          <div><span class="lu-kick">You level up when you can</span>
-          <span class="lu-text">${c.gate}</span>
-          <div class="lu-note">Your coach confirms this milestone with you.</div></div>
-        </div>
+        ${levelup}
       </div>`;
     host.appendChild(card);
   });
   host.querySelectorAll(".ch-head").forEach(head=>{
     head.addEventListener("click", e=>{
       if(e.target.closest("input,label,a")) return;
-      const i=+head.dataset.toggle; state.open[i]=!state.open[i]; save(); renderChapters();
+      const i=+head.dataset.toggle; openState[i]=!openState[i]; saveOpen(); renderChapters();
     });
   });
-  host.querySelectorAll("input[data-check]").forEach(inp=>{
-    inp.addEventListener("change", ()=>{
-      state.checks[inp.dataset.check]=inp.checked; save();
-      renderHere(); renderJourney(); renderChapters();
-    });
+  host.querySelectorAll("input[data-i]").forEach(inp=>{
+    inp.addEventListener("change", ()=> writeCheck(+inp.dataset.i, +inp.dataset.ti, inp.checked));
   });
 }
 
@@ -389,7 +416,7 @@ function renderMiles(){
   const host=document.getElementById("miles");
   host.innerHTML="";
   DATA.miles.forEach(m=>{
-    const val=state.miles[m.id]||0; const hit=val>=m.target;
+    const val=shared.trackers[m.id]||0; const hit=val>=m.target;
     const pct=Math.min(100,Math.round(val/m.target*100));
     const d=document.createElement("div");
     d.className="mile"+(hit?" hit":"");
@@ -404,24 +431,38 @@ function renderMiles(){
   host.querySelectorAll("button[data-m]").forEach(b=>{
     b.addEventListener("click", ()=>{
       const id=b.dataset.m, delta=+b.dataset.d;
-      state.miles[id]=Math.max(0,(state.miles[id]||0)+delta); save(); renderMiles();
+      writeTracker(id, Math.max(0,(shared.trackers[id]||0)+delta));
     });
   });
 }
 
-document.getElementById("resetBtn").addEventListener("click", ()=>{
-  if(confirm("Start fresh? This clears your saved progress on this device.")){
-    state=JSON.parse(JSON.stringify(DEFAULT)); save();
-    ensureOpen(); renderHere(); renderJourney(); renderChapters(); renderMiles();
-  }
-});
+// celebrate when the coach approves a gate
+let prevGates={}, firstLoad=true;
+function celebrate(title){
+  let t=document.getElementById("toast");
+  if(!t){ t=document.createElement("div"); t.id="toast"; t.style.cssText="position:fixed;left:50%;bottom:26px;transform:translateX(-50%);background:#17293D;color:#FAF4E8;font-family:var(--display),sans-serif;font-weight:600;font-size:15px;padding:14px 22px;border-radius:14px;box-shadow:0 20px 50px -18px rgba(0,0,0,.55);z-index:60;border:1px solid #4F9E82;transition:opacity .5s"; document.body.appendChild(t); }
+  t.textContent="🎉 You leveled up: "+title;
+  t.style.opacity="1";
+  clearTimeout(window.__toastT); window.__toastT=setTimeout(()=>{ t.style.opacity="0"; }, 4500);
+}
 
-ensureOpen();
-renderHere();
-renderJourney();
+firebase.auth().onAuthStateChanged(u=>{
+  if(!u) return;
+  roomRef.on("value", snap=>{
+    const v=snap.val()||{};
+    shared.checks = v.checks||{};
+    shared.trackers = Object.assign({trades:0, passes:0}, v.trackers||{});
+    if(firstLoad){ DATA.chapters.forEach((c,i)=>prevGates[i]=gateApproved(i)); firstLoad=false; }
+    else { DATA.chapters.forEach((c,i)=>{ const now=gateApproved(i); if(now && !prevGates[i]) celebrate(c.title); prevGates[i]=now; }); }
+    renderAll();
+  });
+  db.ref(".info/connected").on("value", s=> setSync(!!s.val()));
+});
+firebase.auth().signInAnonymously().catch(e=>{ console.error("auth error", e); setSync(false); });
+
+// initial paint before data arrives
 renderMantras();
-renderChapters();
-renderMiles();
+renderAll();
 </script>
 </body>
 </html>

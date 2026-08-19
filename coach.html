@@ -7,6 +7,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 <style>
   :root{
     --ink:#0B1A2B; --ink2:#0F2135; --panel:#122840; --line:#213C56;
@@ -158,6 +161,7 @@
       <p class="tagline">Teach her a real edge, size it so it survives, then earn it on a <b>Hypernova</b> challenge. <b>No rush</b> — the pace is the point.</p>
     </div>
     <div class="status" id="status">
+      <div id="syncBadge" style="display:flex;align-items:center;gap:7px;font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:10px"><span id="syncDot" style="width:8px;height:8px;border-radius:50%;background:#88A2BB;display:inline-block"></span><span id="syncText">connecting…</span></div>
       <div class="now-label">Currently in</div>
       <div class="now-phase" id="nowPhase">Phase 0</div>
       <div class="pct-row"><span class="pct" id="pctNum">0%</span><span class="pct-sub" id="pctSub">of the plan complete</span></div>
@@ -307,15 +311,45 @@ const DATA = {
   ]
 };
 
-const KEY = "teaching_trading_coach_v1";
-const DEFAULT = { checks:{}, open:{0:true}, trackers:{trades:0, passes:0} };
-let state = load();
+// ---- Firebase shared sync (multiplayer) ----
+const firebaseConfig = {
+  apiKey: "AIzaSyAeEyS179aCc4u82YaKJknqhaCOFznqaDA",
+  authDomain: "tradingmultiplayer.firebaseapp.com",
+  databaseURL: "https://tradingmultiplayer-default-rtdb.firebaseio.com",
+  projectId: "tradingmultiplayer",
+  storageBucket: "tradingmultiplayer.firebasestorage.app",
+  messagingSenderId: "688145836851",
+  appId: "1:688145836851:web:66ecc15effe1baec3a2c46",
+  measurementId: "G-CTL776GG7F"
+};
+const ROOM = "lt-tm-9f3a7c21";
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+const roomRef = db.ref("rooms/" + ROOM);
 
-function load(){
-  try{ const s = JSON.parse(localStorage.getItem(KEY)); if(s && s.checks) return Object.assign({}, DEFAULT, s); }catch(e){}
-  return JSON.parse(JSON.stringify(DEFAULT));
-}
-function save(){ localStorage.setItem(KEY, JSON.stringify(state)); }
+// shared state (synced) + local-only UI prefs (which panels are open)
+const UIKEY = "teaching_trading_coach_ui_v1";
+let state = { checks:{}, trackers:{trades:0, passes:0}, open: loadOpen() };
+function loadOpen(){ try{ const o=JSON.parse(localStorage.getItem(UIKEY)); if(o) return o; }catch(e){} return {0:true}; }
+function saveOpen(){ localStorage.setItem(UIKEY, JSON.stringify(state.open)); }
+
+function writeCheck(key,val){ state.checks[key]=val; renderAll(); roomRef.child("checks/"+key).set(val); }
+function writeTracker(id,val){ state.trackers[id]=val; renderAll(); roomRef.child("trackers/"+id).set(val); }
+function resetAll(){ roomRef.set({ checks:{}, trackers:{trades:0, passes:0} }); }
+function renderAll(){ renderStatus(); renderAscent(); renderPhases(); renderTrackers(); }
+function setSync(on){ const d=document.getElementById("syncDot"), t=document.getElementById("syncText"); if(!d) return; d.style.background=on?"#46D6A8":"#E8735E"; t.textContent=on?"live · synced":"offline"; }
+
+firebase.auth().onAuthStateChanged(u=>{
+  if(!u) return;
+  roomRef.on("value", snap=>{
+    const v=snap.val()||{};
+    state.checks = v.checks||{};
+    state.trackers = Object.assign({trades:0, passes:0}, v.trackers||{});
+    renderAll();
+  });
+  db.ref(".info/connected").on("value", s=> setSync(!!s.val()));
+});
+firebase.auth().signInAnonymously().catch(e=>{ console.error("auth error", e); setSync(false); });
 
 // ---- derived ----
 function totalItems(){
@@ -382,7 +416,7 @@ function renderAscent(){
   });
   svg.innerHTML = html;
   svg.querySelectorAll(".node-hit").forEach(g=>{
-    const go = ()=>{ const n=+g.dataset.goto; state.open={}; state.open[n]=true; save(); renderPhases(); document.getElementById("phase-"+n).scrollIntoView({behavior:"smooth",block:"center"}); };
+    const go = ()=>{ const n=+g.dataset.goto; state.open={}; state.open[n]=true; saveOpen(); renderPhases(); document.getElementById("phase-"+n).scrollIntoView({behavior:"smooth",block:"center"}); };
     g.addEventListener("click", go);
     g.addEventListener("keydown", e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); go(); }});
   });
@@ -459,15 +493,12 @@ function renderPhases(){
   host.querySelectorAll(".ph-head").forEach(head=>{
     head.addEventListener("click", e=>{
       if(e.target.closest("input,label,a,details,summary")) return;
-      const n=+head.dataset.toggle; state.open[n]=!state.open[n]; save(); renderPhases();
+      const n=+head.dataset.toggle; state.open[n]=!state.open[n]; saveOpen(); renderPhases();
     });
   });
   // wire checks
   host.querySelectorAll("input[data-check]").forEach(inp=>{
-    inp.addEventListener("change", ()=>{
-      state.checks[inp.dataset.check] = inp.checked; save();
-      renderStatus(); renderAscent(); renderPhases(); // re-derive state
-    });
+    inp.addEventListener("change", ()=> writeCheck(inp.dataset.check, inp.checked));
   });
   renderStatus(); renderAscent();
 }
@@ -495,23 +526,20 @@ function renderTrackers(){
   host.querySelectorAll("button[data-tk]").forEach(b=>{
     b.addEventListener("click", ()=>{
       const id=b.dataset.tk, d=+b.dataset.d;
-      state.trackers[id] = Math.max(0, (state.trackers[id]||0)+d);
-      save(); renderTrackers();
+      writeTracker(id, Math.max(0, (state.trackers[id]||0)+d));
     });
   });
 }
 
 document.getElementById("resetBtn").addEventListener("click", ()=>{
-  if(confirm("Reset all progress on this dashboard? This can't be undone.")){
-    state = JSON.parse(JSON.stringify(DEFAULT)); save();
-    renderPrinciples(); renderPhases(); renderTrackers();
+  if(confirm("Reset progress for BOTH of you? This wipes the shared board and can't be undone.")){
+    resetAll();
   }
 });
 
 // init
 renderPrinciples();
-renderPhases();
-renderTrackers();
+renderAll();
 </script>
 </body>
 </html>
