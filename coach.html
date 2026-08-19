@@ -144,6 +144,56 @@
   .reset{font-family:var(--mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; background:none; border:1px solid var(--line); color:var(--muted); border-radius:8px; padding:8px 12px; cursor:pointer}
   .reset:hover{border-color:var(--risk); color:var(--risk)}
 
+  /* ---------- Her journal ---------- */
+  .cjournal{margin-top:30px}
+  .j-label{font-family:var(--mono); font-size:11px; letter-spacing:.22em; text-transform:uppercase; color:var(--muted); margin:0}
+  .j-top{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:12px; flex-wrap:wrap}
+  .j-weeknav{display:flex; align-items:center; gap:8px; font-family:var(--mono); font-size:12.5px; color:var(--chalk)}
+  .j-weeknav button{width:30px; height:30px; border-radius:8px; border:1px solid var(--line); background:var(--ink2); color:var(--chalk); cursor:pointer; font-size:15px; line-height:1}
+  .j-weeknav button:hover{border-color:var(--amber); color:var(--amber)}
+  .j-weeknav span{min-width:150px; text-align:center}
+  .j-composer{background:var(--ink2); border:1px solid var(--line); border-radius:var(--r); padding:16px 18px}
+  .j-days{display:flex; gap:6px; margin-bottom:12px; flex-wrap:wrap}
+  .j-day{flex:1; min-width:38px; display:flex; flex-direction:column; align-items:center; gap:1px; padding:7px 3px; border:1px solid var(--line); border-radius:10px; background:var(--ink); color:var(--muted); cursor:pointer; font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:.04em; position:relative}
+  .j-day b{font-size:14px; color:var(--chalk); font-weight:600}
+  .j-day.today{border-color:var(--amber)}
+  .j-day.sel{background:var(--amber); border-color:var(--amber)}
+  .j-day.sel, .j-day.sel b{color:#20160a}
+  .j-day i{position:absolute; top:-6px; right:-6px; background:var(--teal); color:#06231a; font-style:normal; font-size:9px; min-width:16px; height:16px; border-radius:9px; display:flex; align-items:center; justify-content:center; padding:0 3px}
+  .j-composer textarea{width:100%; resize:vertical; min-height:70px; border:1px solid var(--line); border-radius:10px; background:var(--ink); color:var(--chalk); font-family:var(--body); font-size:14.5px; padding:11px 13px}
+  .j-composer textarea::placeholder{color:#5f7b96}
+  .j-controls{display:flex; align-items:center; gap:12px; margin-top:12px; flex-wrap:wrap}
+  .j-attach{font-family:var(--mono); font-size:12.5px; color:var(--chalk); background:var(--ink); border:1px solid var(--line); border-radius:9px; padding:9px 13px; cursor:pointer; white-space:nowrap}
+  .j-attach:hover{border-color:var(--amber); color:var(--amber)}
+  .j-thumbs{display:flex; gap:8px; flex-wrap:wrap; flex:1}
+  .j-thumb{position:relative; display:inline-block}
+  .j-thumb img{width:46px; height:46px; object-fit:cover; border-radius:8px; border:1px solid var(--line)}
+  .j-thumb button{position:absolute; top:-7px; right:-7px; width:20px; height:20px; border-radius:50%; border:none; background:var(--risk); color:#fff; font-size:13px; line-height:1; cursor:pointer}
+  .j-save{font-family:var(--mono); font-size:13px; font-weight:500; color:#20160a; background:var(--amber); border:none; border-radius:9px; padding:10px 18px; cursor:pointer; margin-left:auto}
+  .j-save:hover{filter:brightness(1.08)}
+  .j-save:disabled{opacity:.6; cursor:default}
+  .j-review{margin-top:16px; background:linear-gradient(180deg,rgba(245,184,65,.09),rgba(245,184,65,.02)); border:1px solid #3a3016; border-radius:var(--r); padding:14px 16px}
+  .j-rev-head{display:flex; align-items:center; gap:10px; flex-wrap:wrap}
+  .j-rev-title{font-family:var(--display); font-weight:600; font-size:16px}
+  .j-rev-sum{font-family:var(--mono); font-size:12px; color:var(--muted)}
+  #jRevToggle{margin-left:auto; font-family:var(--mono); font-size:12px; color:var(--amber); background:none; border:1px solid #3a3016; border-radius:8px; padding:6px 12px; cursor:pointer}
+  .j-rev-body{margin-top:12px}
+  .j-rev-day{margin-top:10px}
+  .j-rev-day h4{font-family:var(--mono); font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--amber); margin:0 0 4px}
+  .j-rev-day p{margin:0 0 6px; font-size:14px; white-space:pre-wrap; color:var(--chalk)}
+  .j-week{margin-top:16px; display:flex; flex-direction:column; gap:14px}
+  .j-dayblock{display:flex; flex-direction:column; gap:10px}
+  .j-dayblock-h{font-family:var(--mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted)}
+  .j-empty{color:var(--muted); font-size:14px; text-align:center; padding:14px; font-style:italic}
+  .j-entry{background:var(--ink2); border:1px solid var(--line); border-radius:12px; padding:12px 14px}
+  .j-entry-head{display:flex; align-items:center; gap:10px; margin-bottom:6px}
+  .j-who{font-family:var(--mono); font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--amber); border:1px solid #3a3016; border-radius:999px; padding:2px 8px}
+  .j-del{margin-left:auto; width:24px; height:24px; border-radius:7px; border:1px solid var(--line); background:var(--ink); color:var(--muted); font-size:15px; line-height:1; cursor:pointer}
+  .j-del:hover{border-color:var(--risk); color:var(--risk)}
+  .j-text{margin:0 0 8px; font-size:14.5px; white-space:pre-wrap; color:var(--chalk)}
+  .j-imgs{display:flex; gap:8px; flex-wrap:wrap}
+  .j-img{width:110px; height:110px; object-fit:cover; border-radius:10px; border:1px solid var(--line); cursor:zoom-in}
+
   :focus-visible{outline:2px solid var(--amber); outline-offset:2px; border-radius:4px}
   @media (max-width:620px){
     .trackers{grid-template-columns:1fr}
@@ -181,6 +231,28 @@
   <main class="phases" id="phases"></main>
 
   <section class="trackers" id="trackers"></section>
+
+  <section class="cjournal">
+    <div class="j-top">
+      <h3 class="j-label">Her learning journal</h3>
+      <div class="j-weeknav">
+        <button id="jPrev" aria-label="previous week">‹</button>
+        <span id="jWeekLabel">This week</span>
+        <button id="jNext" aria-label="next week">›</button>
+      </div>
+    </div>
+    <div class="j-composer">
+      <div class="j-days" id="jDayPicker"></div>
+      <textarea id="jText" rows="3" placeholder="Add a coach note about her day, or a screenshot to keep…"></textarea>
+      <div class="j-controls">
+        <label class="j-attach">📷 Add screenshots<input id="jFile" type="file" accept="image/*" multiple hidden/></label>
+        <div class="j-thumbs" id="jThumbs"></div>
+        <button class="j-save" id="jSave">Add to day</button>
+      </div>
+    </div>
+    <div class="j-review" id="jReview"></div>
+    <div class="j-week" id="jWeek"></div>
+  </section>
 
   <footer>
     <p id="footNote">Coach copy · progress saved in this browser only · <a href="learner.html">open her journal →</a></p>
@@ -335,18 +407,100 @@ function saveOpen(){ localStorage.setItem(UIKEY, JSON.stringify(state.open)); }
 
 function writeCheck(key,val){ state.checks[key]=val; renderAll(); roomRef.child("checks/"+key).set(val); }
 function writeTracker(id,val){ state.trackers[id]=val; renderAll(); roomRef.child("trackers/"+id).set(val); }
-function resetAll(){ roomRef.set({ checks:{}, trackers:{trades:0, passes:0} }); }
+function resetAll(){ roomRef.child("checks").set({}); roomRef.child("trackers").set({trades:0, passes:0}); }
 function renderAll(){ renderStatus(); renderAscent(); renderPhases(); renderTrackers(); }
 function setSync(on){ const d=document.getElementById("syncDot"), t=document.getElementById("syncText"); if(!d) return; d.style.background=on?"#46D6A8":"#E8735E"; t.textContent=on?"live · synced":"offline"; }
 
+// ---- weekly learning journal (day-by-day, text + screenshots, synced) ----
+const JOURNAL_AUTHOR = "coach";
+let journalMap = {}, pendingImages = [], revOpen = false;
+let selWeek = mondayOf(new Date()), selDay = null;
+
+function pad2(n){ return (n<10?"0":"")+n; }
+function ymd(d){ return d.getFullYear()+"-"+pad2(d.getMonth()+1)+"-"+pad2(d.getDate()); }
+function parseYmd(s){ const a=s.split("-").map(Number); return new Date(a[0],a[1]-1,a[2]); }
+function mondayOf(d){ const x=new Date(d.getFullYear(),d.getMonth(),d.getDate()); const wd=(x.getDay()+6)%7; x.setDate(x.getDate()-wd); return x; }
+function addDays(d,n){ const x=new Date(d); x.setDate(x.getDate()+n); return x; }
+function shortDate(d){ return d.toLocaleDateString(undefined,{month:"short",day:"numeric"}); }
+function dayName(d){ return d.toLocaleDateString(undefined,{weekday:"short"}); }
+function escapeHtml(s){ return (s||"").replace(/[&<>"]/g, c=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[c])); }
+
+function weekDays(){ return Array.from({length:7},(_,i)=>addDays(selWeek,i)); }
+function inSelWeek(dateStr){ return ymd(mondayOf(parseYmd(dateStr)))===ymd(selWeek); }
+function weekEntries(){ return Object.keys(journalMap).map(id=>Object.assign({id},journalMap[id])).filter(e=>e.date && inSelWeek(e.date)); }
+function dayEntries(dstr){ return weekEntries().filter(e=>e.date===dstr).sort((a,b)=>(a.ts||0)-(b.ts||0)); }
+
+function compressImage(file, maxDim=1200, quality=0.72){
+  return new Promise((resolve,reject)=>{
+    const r=new FileReader();
+    r.onload=()=>{ const img=new Image();
+      img.onload=()=>{ let w=img.width,h=img.height;
+        if(w>maxDim||h>maxDim){ if(w>=h){ h=Math.round(h*maxDim/w); w=maxDim; } else { w=Math.round(w*maxDim/h); h=maxDim; } }
+        const c=document.createElement("canvas"); c.width=w; c.height=h; c.getContext("2d").drawImage(img,0,0,w,h);
+        resolve(c.toDataURL("image/jpeg",quality)); };
+      img.onerror=reject; img.src=r.result; };
+    r.onerror=reject; r.readAsDataURL(file);
+  });
+}
+function renderThumbs(){
+  const box=document.getElementById("jThumbs"); if(!box) return;
+  box.innerHTML=pendingImages.map((src,i)=>`<span class="j-thumb"><img src="${src}" alt=""/><button data-rm="${i}" aria-label="remove">×</button></span>`).join("");
+  box.querySelectorAll("button[data-rm]").forEach(b=>b.addEventListener("click",()=>{ pendingImages.splice(+b.dataset.rm,1); renderThumbs(); }));
+}
+function openLightbox(src){
+  let o=document.getElementById("jLightbox");
+  if(!o){ o=document.createElement("div"); o.id="jLightbox"; o.style.cssText="position:fixed;inset:0;background:rgba(6,15,25,.9);display:flex;align-items:center;justify-content:center;z-index:80;padding:20px;cursor:zoom-out"; o.innerHTML='<img style="max-width:96%;max-height:96%;border-radius:10px"/>'; o.addEventListener("click",()=>o.remove()); document.body.appendChild(o); }
+  else document.body.appendChild(o);
+  o.querySelector("img").src=src;
+}
+
+function renderJournal(){
+  const wk=document.getElementById("jWeek"); if(!wk) return;
+  const days=weekDays(), today=ymd(new Date());
+  const thisWeek = ymd(selWeek)===ymd(mondayOf(new Date()));
+  document.getElementById("jWeekLabel").textContent=(thisWeek?"This week · ":"")+shortDate(days[0])+" – "+shortDate(days[6]);
+  if(!selDay || !days.some(d=>ymd(d)===selDay)) selDay = days.some(d=>ymd(d)===today)?today:ymd(days[0]);
+  document.getElementById("jDayPicker").innerHTML=days.map(d=>{ const ds=ymd(d), n=dayEntries(ds).length;
+    return `<button class="j-day${ds===selDay?" sel":""}${ds===today?" today":""}" data-day="${ds}">${dayName(d)}<b>${d.getDate()}</b>${n?`<i>${n}</i>`:""}</button>`; }).join("");
+  document.getElementById("jDayPicker").querySelectorAll("button[data-day]").forEach(b=>b.addEventListener("click",()=>{ selDay=b.dataset.day; renderJournal(); }));
+  const we=weekEntries().sort((a,b)=>(a.ts||0)-(b.ts||0));
+  const allImgs=we.flatMap(e=>e.images||[]);
+  document.getElementById("jReview").innerHTML=
+    `<div class="j-rev-head"><span class="j-rev-title">📋 Week in review</span><span class="j-rev-sum">${we.length} entr${we.length===1?"y":"ies"} · ${allImgs.length} screenshot${allImgs.length===1?"":"s"}</span><button id="jRevToggle">${revOpen?"Hide":"Show all"}</button></div>`+
+    (revOpen?`<div class="j-rev-body">${allImgs.length?`<div class="j-imgs">${allImgs.map(s=>`<img class="j-img" src="${s}"/>`).join("")}</div>`:""}${we.length?days.map(d=>{const ds=ymd(d),de=dayEntries(ds);if(!de.length)return"";return `<div class="j-rev-day"><h4>${dayName(d)} ${shortDate(d)}</h4>${de.map(e=>e.text?`<p>${escapeHtml(e.text)}</p>`:"").join("")}</div>`;}).join(""):`<p class="j-empty">Nothing logged this week yet.</p>`}</div>`:"");
+  const tg=document.getElementById("jRevToggle"); if(tg) tg.addEventListener("click",()=>{ revOpen=!revOpen; renderJournal(); });
+  wk.innerHTML=days.map(d=>{ const ds=ymd(d), de=dayEntries(ds); if(!de.length) return "";
+    return `<div class="j-dayblock"><div class="j-dayblock-h">${dayName(d)} · ${shortDate(d)}</div>${de.map(e=>
+      `<div class="j-entry"><div class="j-entry-head"><span class="j-who">${e.author==="coach"?"Coach":"Her"}</span><button class="j-del" data-del="${e.id}" aria-label="delete">×</button></div>${e.text?`<p class="j-text">${escapeHtml(e.text)}</p>`:""}${(e.images||[]).length?`<div class="j-imgs">${e.images.map(s=>`<img class="j-img" src="${s}"/>`).join("")}</div>`:""}</div>`).join("")}</div>`;
+    }).join("") || `<p class="j-empty">No entries this week yet.</p>`;
+  document.querySelectorAll("#jReview .j-img, #jWeek .j-img").forEach(im=>im.addEventListener("click",()=>openLightbox(im.src)));
+  wk.querySelectorAll("button[data-del]").forEach(b=>b.addEventListener("click",()=>{ if(confirm("Delete this entry?")) roomRef.child("journal/"+b.dataset.del).remove(); }));
+}
+
+function initJournal(){
+  const file=document.getElementById("jFile"), save=document.getElementById("jSave"), ta=document.getElementById("jText");
+  const prev=document.getElementById("jPrev"), next=document.getElementById("jNext");
+  if(!save) return;
+  prev.addEventListener("click",()=>{ selWeek=addDays(selWeek,-7); revOpen=false; selDay=null; renderJournal(); });
+  next.addEventListener("click",()=>{ selWeek=addDays(selWeek,7); revOpen=false; selDay=null; renderJournal(); });
+  file.addEventListener("change", async ()=>{ save.disabled=true; for(const f of Array.from(file.files)){ try{ pendingImages.push(await compressImage(f)); }catch(e){ console.error(e); } } file.value=""; renderThumbs(); save.disabled=false; });
+  save.addEventListener("click", async ()=>{
+    const text=ta.value.trim(); if(!text && pendingImages.length===0) return;
+    save.disabled=true; const lab=save.textContent; save.textContent="Saving…";
+    const ts=Date.now();
+    try{ await roomRef.child("journal").push({ ts, date:selDay, author:JOURNAL_AUTHOR, chapter:currentPhase(), text, images:pendingImages.slice() }); ta.value=""; pendingImages=[]; renderThumbs(); }
+    catch(e){ console.error(e); alert("Couldn't save — check your connection."); }
+    save.textContent=lab; save.disabled=false;
+  });
+}
+
 firebase.auth().onAuthStateChanged(u=>{
   if(!u) return;
-  roomRef.on("value", snap=>{
-    const v=snap.val()||{};
-    state.checks = v.checks||{};
-    state.trackers = Object.assign({trades:0, passes:0}, v.trackers||{});
-    renderAll();
-  });
+  roomRef.child("checks").on("value", snap=>{ state.checks = snap.val()||{}; renderAll(); });
+  roomRef.child("trackers").on("value", snap=>{ state.trackers = Object.assign({trades:0, passes:0}, snap.val()||{}); renderAll(); });
+  roomRef.child("journal").on("child_added", s=>{ journalMap[s.key]=s.val(); renderJournal(); });
+  roomRef.child("journal").on("child_changed", s=>{ journalMap[s.key]=s.val(); renderJournal(); });
+  roomRef.child("journal").on("child_removed", s=>{ delete journalMap[s.key]; renderJournal(); });
   db.ref(".info/connected").on("value", s=> setSync(!!s.val()));
 });
 firebase.auth().signInAnonymously().catch(e=>{ console.error("auth error", e); setSync(false); });
@@ -540,6 +694,8 @@ document.getElementById("resetBtn").addEventListener("click", ()=>{
 // init
 renderPrinciples();
 renderAll();
+renderJournal();
+initJournal();
 </script>
 </body>
 </html>
