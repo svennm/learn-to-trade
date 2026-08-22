@@ -4,6 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Your Trading Journey · 7tics</title>
+<script>try{document.documentElement.setAttribute('data-theme',localStorage.getItem('teaching_trading_theme')||'dark');}catch(e){document.documentElement.setAttribute('data-theme','dark');}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -20,6 +21,16 @@
     --body:'IBM Plex Sans',system-ui,sans-serif;
     --mono:'IBM Plex Mono',ui-monospace,monospace;
   }
+  html[data-theme="dark"]{
+    --paper:#0F1821; --paper2:#16232E; --card:#1B2A36;
+    --ink:#ECE3D2; --ink-soft:#94A3AF; --line:#2C3D4A;
+    --amber:#E7A63C; --amber-soft:#5E4A24; --sage:#5FB79A; --brick:#D9805F;
+  }
+  html[data-theme="dark"] body{
+    background-image:radial-gradient(circle at 1px 1px, rgba(255,255,255,.035) 1px, transparent 0);
+  }
+  html[data-theme="dark"] .j-composer textarea::placeholder{color:#6C7A86}
+  html[data-theme="dark"] .minibar{background:#22323F}
   *{box-sizing:border-box}
   html{scroll-behavior:smooth}
   body{
@@ -178,9 +189,45 @@
 
   :focus-visible{outline:2px solid var(--amber); outline-offset:2px; border-radius:4px}
   @media (max-width:600px){ .mantras ul{grid-template-columns:1fr} .miles{grid-template-columns:1fr} }
+
+  /* theme toggle */
+  .theme-toggle{position:fixed; top:14px; right:14px; z-index:70; width:40px; height:40px; border-radius:50%; border:1px solid var(--line); background:var(--card); color:var(--ink); font-size:17px; cursor:pointer; display:grid; place-items:center; box-shadow:0 8px 24px -14px rgba(0,0,0,.5); transition:.15s}
+  .theme-toggle:hover{border-color:var(--amber); color:var(--amber)}
+
+  /* hero: progress ring + streak */
+  .here-row{display:flex; gap:18px; align-items:flex-start}
+  .here-main{flex:1; min-width:0}
+  .here-side{display:flex; flex-direction:column; align-items:center; gap:8px; flex:0 0 auto}
+  .ring-wrap{position:relative; width:76px; height:76px}
+  .ring-wrap svg{transform:rotate(-90deg)}
+  .ring-num{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; font-family:var(--mono); pointer-events:none}
+  .ring-num b{font-size:18px; color:var(--ink); line-height:1}
+  .ring-num span{font-size:8.5px; color:var(--ink-soft); letter-spacing:.1em; text-transform:uppercase; margin-top:2px}
+  .streak-chip{font-family:var(--mono); font-size:11px; color:var(--amber); background:rgba(206,132,24,.12); border:1px solid var(--amber-soft); border-radius:999px; padding:4px 10px; white-space:nowrap; text-align:center}
+  .streak-chip.cold{color:var(--ink-soft); background:transparent; border-color:var(--line)}
+
+  /* hands-on tools */
+  .tool{margin:4px 0 4px; background:var(--paper2); border:1px solid var(--line); border-radius:12px; padding:14px 15px}
+  .tool + .tool{margin-top:12px}
+  .tool-h{font-family:var(--mono); font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--amber); margin:0 0 11px; display:flex; align-items:center; gap:7px}
+  .tool-grid{display:grid; grid-template-columns:1fr 1fr; gap:9px 12px}
+  .tf{display:flex; flex-direction:column; gap:3px; justify-content:flex-end}
+  .tf label{font-family:var(--mono); font-size:10.5px; letter-spacing:.03em; color:var(--ink-soft)}
+  .tf input{font-family:var(--mono); font-size:14px; background:var(--card); color:var(--ink); border:1px solid var(--line); border-radius:8px; padding:8px 10px; width:100%}
+  .tf input:focus{outline:none; border-color:var(--amber)}
+  .tool-out{margin-top:12px; font-size:13.5px; line-height:1.55; background:var(--card); border:1px solid var(--line); border-left:3px solid var(--sage); border-radius:8px; padding:11px 13px}
+  .tool-out b{color:var(--amber); font-family:var(--mono)}
+  .tool-out .big{font-family:var(--mono); font-size:20px; font-weight:600; color:var(--sage)}
+  .tool-out .warn{color:var(--brick)}
+  .tool-btn{font-family:var(--mono); font-size:12.5px; font-weight:500; color:#fff; background:var(--amber); border:none; border-radius:8px; padding:9px 16px; cursor:pointer; width:100%}
+  .tool-btn:hover{filter:brightness(1.08)}
+  .tool canvas{display:block; width:100%; height:120px; margin-top:11px; background:var(--card); border:1px solid var(--line); border-radius:8px}
+  .try-label{font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--sage); margin:16px 0 8px}
+  @media (max-width:520px){ .tool-grid{grid-template-columns:1fr} }
 </style>
 </head>
 <body>
+<button id="themeToggle" class="theme-toggle" aria-label="Toggle dark mode" title="Toggle light/dark">☀</button>
 <div class="wrap">
 
   <p class="eyebrow">7tics · my learning journal</p>
@@ -378,13 +425,30 @@ function setSync(on){ const d=document.getElementById("syncDot"), t=document.get
 
 function renderAll(){ ensureOpen(); renderHere(); renderJourney(); renderChapters(); renderMiles(); }
 
+function heroSide(){
+  const total=DATA.chapters.length;
+  const done=DATA.chapters.filter((_,i)=>gateApproved(i)).length;
+  const r=30, C=2*Math.PI*r, off=C*(1-done/total);
+  const ring=`<div class="ring-wrap"><svg viewBox="0 0 76 76" width="76" height="76" aria-hidden="true">
+      <circle cx="38" cy="38" r="${r}" fill="none" stroke="${cssVar('--line')}" stroke-width="7"/>
+      <circle cx="38" cy="38" r="${r}" fill="none" stroke="${cssVar('--sage')}" stroke-width="7" stroke-linecap="round" stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${off.toFixed(1)}"/>
+    </svg><div class="ring-num"><b>${done}/${total}</b><span>done</span></div></div>`;
+  const s=currentStreak();
+  const streak = s>0
+    ? `<div class="streak-chip">🔥 ${s}-day streak</div>`
+    : `<div class="streak-chip cold">log daily 🔥</div>`;
+  return `<div class="here-side">${ring}${streak}</div>`;
+}
+
 function renderHere(){
   const el=document.getElementById("here");
   const cur=currentChapter();
   const total=DATA.chapters.length;
   if(cur>=total){
-    el.innerHTML=`<span class="kick">You did it</span><h2>Every chapter complete 🎉</h2>
-      <p>You've walked the whole path — myths to a live, tested edge. Now it's a craft you keep sharpening.</p>`;
+    el.innerHTML=`<div class="here-row"><div class="here-main">
+      <span class="kick">You did it</span><h2>Every chapter complete 🎉</h2>
+      <p>You've walked the whole path — myths to a live, tested edge. Now it's a craft you keep sharpening.</p>
+      </div>${heroSide()}</div>`;
     return;
   }
   const ch=DATA.chapters[cur];
@@ -392,27 +456,29 @@ function renderHere(){
   const todo = left===0
     ? `<div class="todo none">All practice done — your coach will confirm when you level up.</div>`
     : `<div class="todo">▸ ${left} thing${left>1?"s":""} to practise in this chapter</div>`;
-  el.innerHTML=`<span class="ch-of">Chapter ${cur+1} of ${total}</span>
-    <span class="kick">You are here</span>
-    <h2>${ch.title}</h2>
-    <p>${ch.learn}</p>${todo}`;
+  el.innerHTML=`<div class="here-row"><div class="here-main">
+      <span class="kick">You are here · Chapter ${cur+1} of ${total}</span>
+      <h2>${ch.title}</h2>
+      <p>${ch.learn}</p>${todo}
+      </div>${heroSide()}</div>`;
 }
 
 const NX=[50,158,266,374,482,590,656], NY=[158,146,128,102,90,56,34];
 function renderJourney(){
   const svg=document.getElementById("journeySvg");
+  const cLine=cssVar('--line'), cAmber=cssVar('--amber'), cSage=cssVar('--sage'), cUp=cssVar('--paper2');
   const pts=DATA.chapters.map((_,i)=>[NX[i],NY[i]]);
   const cur=currentChapter();
   const doneUpto = Math.min(cur, pts.length-1);
   let h="";
-  h+=`<polyline points="${pts.map(p=>p.join(",")).join(" ")}" fill="none" stroke="#DCCFB6" stroke-width="3" stroke-linejoin="round"/>`;
+  h+=`<polyline points="${pts.map(p=>p.join(",")).join(" ")}" fill="none" stroke="${cLine}" stroke-width="3" stroke-linejoin="round"/>`;
   const lit=pts.slice(0,Math.max(doneUpto+1,1));
-  if(lit.length>1) h+=`<polyline points="${lit.map(p=>p.join(",")).join(" ")}" fill="none" stroke="#CE8418" stroke-width="3" stroke-linejoin="round"/>`;
-  h+=`<g transform="translate(656,34)"><line x1="0" y1="0" x2="0" y2="-22" stroke="#4F9E82" stroke-width="2"/><path d="M0,-22 L14,-17 L0,-12 Z" fill="#4F9E82"/></g>`;
+  if(lit.length>1) h+=`<polyline points="${lit.map(p=>p.join(",")).join(" ")}" fill="none" stroke="${cAmber}" stroke-width="3" stroke-linejoin="round"/>`;
+  h+=`<g transform="translate(656,34)"><line x1="0" y1="0" x2="0" y2="-22" stroke="${cSage}" stroke-width="2"/><path d="M0,-22 L14,-17 L0,-12 Z" fill="${cSage}"/></g>`;
   DATA.chapters.forEach((c,i)=>{
     const st=chapterState(i); const x=NX[i], y=NY[i];
-    const fill = st==="done" ? "#4F9E82" : (st==="current" ? "#CE8418" : "#FAF4E8");
-    const stroke = st==="done" ? "#4F9E82" : (st==="current" ? "#CE8418" : "#C9B89C");
+    const fill = st==="done" ? cSage : (st==="current" ? cAmber : cUp);
+    const stroke = st==="done" ? cSage : (st==="current" ? cAmber : cLine);
     const cls = st==="current" ? "ping" : "";
     h+=`<circle class="${cls}" cx="${x}" cy="${y}" r="9" fill="${fill}" stroke="${stroke}" stroke-width="2"/>`;
     if(st==="done") h+=`<path d="M${x-4},${y} l3,3 l5,-6" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`;
@@ -444,6 +510,8 @@ function renderChapters(){
       const id="lt-"+i+"-"+ti; const on=taskChecked(i,ti);
       return `<li><input type="checkbox" id="${id}" data-i="${i}" data-ti="${ti}" ${on?"checked":""}/><label for="${id}">${t}</label></li>`;
     }).join("");
+    const chTools = TOOLS[i] || [];
+    const toolsBlock = chTools.length ? `<p class="try-label">🛠 Try it right here</p>${chTools.map(t=>t.html).join("")}` : "";
     const passed=gateApproved(i);
     const levelup = passed
       ? `<div class="levelup" style="border-color:#4F9E82;background:linear-gradient(180deg,rgba(79,158,130,.13),rgba(79,158,130,.04))">
@@ -472,9 +540,11 @@ function renderChapters(){
         <p class="learn">${c.learn}</p>
         <p class="focus-label">Your focus — check off as you practise</p>
         <ul class="todo">${tasks}</ul>
+        ${toolsBlock}
         ${levelup}
       </div>`;
     host.appendChild(card);
+    chTools.forEach(t=>t.init(card));
   });
   host.querySelectorAll(".ch-head").forEach(head=>{
     head.addEventListener("click", e=>{
@@ -519,6 +589,7 @@ function celebrate(title){
   t.textContent="🎉 You leveled up: "+title;
   t.style.opacity="1";
   clearTimeout(window.__toastT); window.__toastT=setTimeout(()=>{ t.style.opacity="0"; }, 4500);
+  confetti();
 }
 
 // ---- weekly learning journal (day-by-day, text + screenshots, synced) ----
@@ -585,6 +656,7 @@ function renderJournal(){
     }).join("") || `<p class="j-empty">No entries this week yet — pick a day above and write your first one.</p>`;
   document.querySelectorAll("#jReview .j-img, #jWeek .j-img").forEach(im=>im.addEventListener("click",()=>openLightbox(im.src)));
   wk.querySelectorAll("button[data-del]").forEach(b=>b.addEventListener("click",()=>{ if(confirm("Delete this entry?")) roomRef.child("journal/"+b.dataset.del).remove(); }));
+  if(document.getElementById("here")) renderHere();
 }
 
 function initJournal(){
@@ -620,7 +692,208 @@ firebase.auth().onAuthStateChanged(u=>{
 });
 firebase.auth().signInAnonymously().catch(e=>{ console.error("auth error", e); setSync(false); });
 
+// ---- theme toggle ----
+function cssVar(n){ try{ return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }catch(e){ return ""; } }
+const THEME_KEY="teaching_trading_theme";
+function applyTheme(t){
+  document.documentElement.setAttribute("data-theme", t);
+  try{ localStorage.setItem(THEME_KEY, t); }catch(e){}
+  const b=document.getElementById("themeToggle"); if(b) b.textContent = t==="dark" ? "☀" : "☾";
+}
+function initTheme(){
+  let saved="dark"; try{ saved=localStorage.getItem(THEME_KEY)||"dark"; }catch(e){}
+  applyTheme(saved);
+  const b=document.getElementById("themeToggle");
+  if(b) b.addEventListener("click", ()=>{
+    const cur=document.documentElement.getAttribute("data-theme");
+    applyTheme(cur==="dark"?"light":"dark");
+    renderAll();
+  });
+}
+
+// ---- streak: consecutive days ending today (or yesterday) with a journal entry ----
+function currentStreak(){
+  const days=new Set(Object.values(journalMap).map(e=>e && e.date).filter(Boolean));
+  if(!days.size) return 0;
+  let cursor=new Date(); cursor=new Date(cursor.getFullYear(),cursor.getMonth(),cursor.getDate());
+  if(!days.has(ymd(cursor))) cursor=addDays(cursor,-1); // today unlogged doesn't break the streak yet
+  let n=0;
+  while(days.has(ymd(cursor))){ n++; cursor=addDays(cursor,-1); }
+  return n;
+}
+
+// ---- confetti burst on level-up ----
+function confetti(){
+  const c=document.createElement("canvas");
+  c.style.cssText="position:fixed;inset:0;pointer-events:none;z-index:90";
+  document.body.appendChild(c);
+  const DPR=window.devicePixelRatio||1;
+  c.width=innerWidth*DPR; c.height=innerHeight*DPR;
+  const ctx=c.getContext("2d");
+  const cols=[cssVar('--amber'),cssVar('--sage'),cssVar('--brick'),'#F0C468'];
+  const P=[];
+  for(let i=0;i<140;i++){
+    P.push({ x:Math.random()*c.width, y:-20*DPR - Math.random()*c.height*0.35,
+      vx:(Math.random()-0.5)*6*DPR, vy:(3+Math.random()*5)*DPR,
+      r:(4+Math.random()*5)*DPR, col:cols[i%cols.length],
+      rot:Math.random()*6.28, vr:(Math.random()-0.5)*0.3 });
+  }
+  let t=0; const max=170;
+  (function frame(){
+    t++; ctx.clearRect(0,0,c.width,c.height);
+    for(const p of P){ p.x+=p.vx; p.y+=p.vy; p.vy+=0.12*DPR; p.rot+=p.vr;
+      ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.rot);
+      ctx.globalAlpha=Math.max(0,1-t/max); ctx.fillStyle=p.col;
+      ctx.fillRect(-p.r/2,-p.r/2,p.r,p.r*0.62); ctx.restore(); }
+    if(t<max) requestAnimationFrame(frame); else c.remove();
+  })();
+}
+
+// ---- equity-curve painter for the blow-up sim ----
+function drawCurves(canvas,sample,ruin){
+  const DPR=window.devicePixelRatio||1;
+  const W=canvas.clientWidth||360, H=canvas.clientHeight||120;
+  canvas.width=W*DPR; canvas.height=H*DPR;
+  const ctx=canvas.getContext("2d"); ctx.setTransform(DPR,0,0,DPR,0,0);
+  ctx.clearRect(0,0,W,H);
+  let max=1.3; sample.forEach(s=>s.curve.forEach(v=>{ if(v>max) max=v; }));
+  const T=sample.length?sample[0].curve.length-1:1;
+  const X=i=>i/T*W, Y=v=>H-Math.min(v,max)/max*H;
+  ctx.strokeStyle=cssVar('--line'); ctx.lineWidth=1; ctx.setLineDash([4,4]);
+  ctx.beginPath(); ctx.moveTo(0,Y(ruin)); ctx.lineTo(W,Y(ruin)); ctx.stroke(); ctx.setLineDash([]);
+  const sage=cssVar('--sage'), brick=cssVar('--brick');
+  sample.forEach(s=>{
+    ctx.strokeStyle=s.dead?brick:sage; ctx.globalAlpha=s.dead?0.6:0.42; ctx.lineWidth=1;
+    ctx.beginPath(); s.curve.forEach((v,i)=> i?ctx.lineTo(X(i),Y(v)):ctx.moveTo(X(i),Y(v))); ctx.stroke();
+  });
+  ctx.globalAlpha=1;
+}
+
+// ---- hands-on tools (each maps to a curriculum task) ----
+const costTool={ html:`
+  <div class="tool">
+    <p class="tool-h">🧮 True cost of one round-trip</p>
+    <div class="tool-grid">
+      <div class="tf"><label>Position size ($ notional)</label><input id="cc-notional" type="number" value="1000"></div>
+      <div class="tf"><label>Spread (%)</label><input id="cc-spread" type="number" step="0.001" value="0.02"></div>
+      <div class="tf"><label>Fee per side (%)</label><input id="cc-fee" type="number" step="0.001" value="0.035"></div>
+      <div class="tf"><label>Funding over hold (%)</label><input id="cc-funding" type="number" step="0.001" value="0.01"></div>
+      <div class="tf"><label>Slippage per side (%)</label><input id="cc-slip" type="number" step="0.001" value="0.02"></div>
+      <div class="tf"><label>$ you risk (1R)</label><input id="cc-risk" type="number" value="20"></div>
+    </div>
+    <div class="tool-out" id="cc-out"></div>
+  </div>`,
+  init(root){
+    const out=root.querySelector("#cc-out");
+    const g=id=>parseFloat(root.querySelector("#"+id).value)||0;
+    function calc(){
+      const N=g("cc-notional"), sp=g("cc-spread")/100, fee=g("cc-fee")/100, fund=g("cc-funding")/100, sl=g("cc-slip")/100, risk=g("cc-risk");
+      const cost=N*(sp+2*fee+fund+2*sl);
+      const pct=N?cost/N*100:0, inR=risk?cost/risk:0;
+      out.innerHTML=`Round-trip cost: <span class="big">$${cost.toFixed(2)}</span><br>
+        That's <b>${pct.toFixed(3)}%</b> of your position — about <b>${inR.toFixed(2)}R</b> gone before price moves.<br>
+        <span style="color:var(--ink-soft)">You clear this just to break even. ${inR>=0.25?`<span class="warn">That's a big bite of your R — trade less often or size the cost down.</span>`:`Keep costs well under a quarter of your R.`}</span>`;
+    }
+    ["cc-notional","cc-spread","cc-fee","cc-funding","cc-slip","cc-risk"].forEach(id=>root.querySelector("#"+id).addEventListener("input",calc));
+    calc();
+  }
+};
+const posSizeTool={ html:`
+  <div class="tool">
+    <p class="tool-h">📐 Position-size calculator</p>
+    <div class="tool-grid">
+      <div class="tf"><label>Account ($)</label><input id="ps-acct" type="number" value="10000"></div>
+      <div class="tf"><label>Risk per trade (%)</label><input id="ps-risk" type="number" step="0.1" value="1"></div>
+      <div class="tf"><label>Entry price</label><input id="ps-entry" type="number" step="any" value="100"></div>
+      <div class="tf"><label>Stop price</label><input id="ps-stop" type="number" step="any" value="98"></div>
+    </div>
+    <div class="tool-out" id="ps-out"></div>
+  </div>`,
+  init(root){
+    const out=root.querySelector("#ps-out");
+    const g=id=>parseFloat(root.querySelector("#"+id).value)||0;
+    function calc(){
+      const acct=g("ps-acct"), riskPct=g("ps-risk")/100, entry=g("ps-entry"), stop=g("ps-stop");
+      const riskDollars=acct*riskPct, dist=Math.abs(entry-stop);
+      if(!dist||!entry){ out.innerHTML=`Enter an entry and a stop that differ.`; return; }
+      const distPct=dist/entry*100, notional=riskDollars/(dist/entry), units=notional/entry;
+      out.innerHTML=`Risk <span class="big">$${riskDollars.toFixed(2)}</span> = 1R.<br>
+        Stop is <b>${distPct.toFixed(2)}%</b> away → position size <b>$${notional.toFixed(0)}</b> (${units.toFixed(4)} units).<br>
+        <span style="color:var(--ink-soft)">Hit the stop and you lose exactly 1R. Wider stop → smaller size. That's the whole trick.</span>`;
+    }
+    ["ps-acct","ps-risk","ps-entry","ps-stop"].forEach(id=>root.querySelector("#"+id).addEventListener("input",calc));
+    calc();
+  }
+};
+const blowupTool={ html:`
+  <div class="tool">
+    <p class="tool-h">💥 Blow-up simulator</p>
+    <div class="tool-grid">
+      <div class="tf"><label>Risk per trade (%)</label><input id="bu-risk" type="number" step="0.1" value="2"></div>
+      <div class="tf"><label>Win rate (%)</label><input id="bu-wr" type="number" step="1" value="45"></div>
+      <div class="tf"><label>Avg win (R)</label><input id="bu-win" type="number" step="0.1" value="2"></div>
+      <div class="tf"><label>Avg loss (R)</label><input id="bu-loss" type="number" step="0.1" value="1"></div>
+      <div class="tf"><label>Trades per run</label><input id="bu-trades" type="number" step="10" value="100"></div>
+      <div class="tf"><button class="tool-btn" id="bu-run" type="button">Run 500 lives</button></div>
+    </div>
+    <canvas id="bu-canvas"></canvas>
+    <div class="tool-out" id="bu-out">Set your numbers and run it — each line is one possible future.</div>
+  </div>`,
+  init(root){
+    const out=root.querySelector("#bu-out"), canvas=root.querySelector("#bu-canvas");
+    const g=id=>parseFloat(root.querySelector("#"+id).value)||0;
+    root.querySelector("#bu-run").addEventListener("click",()=>{
+      const riskFrac=g("bu-risk")/100, wr=g("bu-wr")/100, winR=g("bu-win"), lossR=g("bu-loss")||1, T=Math.max(1,Math.round(g("bu-trades")));
+      const RUNS=500, RUIN=0.5; let ruined=0; const finals=[], sample=[];
+      for(let r=0;r<RUNS;r++){
+        let bal=1, dead=false; const curve=[bal];
+        for(let t=0;t<T;t++){
+          bal *= (Math.random()<wr) ? (1+riskFrac*winR) : (1-riskFrac*lossR);
+          if(bal<=RUIN) dead=true;
+          curve.push(bal);
+        }
+        if(dead) ruined++; finals.push(bal);
+        if(r<24) sample.push({curve,dead});
+      }
+      finals.sort((a,b)=>a-b);
+      const median=finals[Math.floor(finals.length/2)], survPct=100*(1-ruined/RUNS);
+      drawCurves(canvas,sample,RUIN);
+      const verdict = ruined/RUNS>0.2 ? `<span class="warn">Too many lives blow up — cut your risk-per-trade.</span>`
+        : (median>1 ? `Most lives survive and grow — this risk level is sane.` : `Survivable, but the edge is thin.`);
+      out.innerHTML=`<b>${survPct.toFixed(0)}%</b> of 500 lives survived (never lost half).<br>
+        Median ending balance: <span class="big">${median.toFixed(2)}×</span>.<br>
+        <span style="color:var(--ink-soft)">${verdict}</span>`;
+    });
+  }
+};
+const expectancyTool={ html:`
+  <div class="tool">
+    <p class="tool-h">📊 Expectancy calculator</p>
+    <div class="tool-grid">
+      <div class="tf"><label>Win rate (%)</label><input id="ex-wr" type="number" step="1" value="45"></div>
+      <div class="tf"><label>Avg win (R)</label><input id="ex-win" type="number" step="0.1" value="2"></div>
+      <div class="tf"><label>Avg loss (R)</label><input id="ex-loss" type="number" step="0.1" value="1"></div>
+    </div>
+    <div class="tool-out" id="ex-out"></div>
+  </div>`,
+  init(root){
+    const out=root.querySelector("#ex-out");
+    const g=id=>parseFloat(root.querySelector("#"+id).value)||0;
+    function calc(){
+      const wr=g("ex-wr")/100, winR=g("ex-win"), lossR=g("ex-loss")||1;
+      const exp=wr*winR-(1-wr)*lossR, per40=exp*40, good=exp>0;
+      out.innerHTML=`Expectancy: <span class="big"${good?"":` style="color:var(--brick)"`}>${exp>=0?"+":""}${exp.toFixed(3)}R</span> per trade.<br>
+        Over 40 trades that's about <b>${per40>=0?"+":""}${per40.toFixed(1)}R</b>.<br>
+        <span style="color:var(--ink-soft)">${good?"Positive edge — worth taking every time, over the long run.":`<span class="warn">Negative edge — this setup loses over time. Raise win rate or avg win, or drop it.</span>`}</span>`;
+    }
+    ["ex-wr","ex-win","ex-loss"].forEach(id=>root.querySelector("#"+id).addEventListener("input",calc));
+    calc();
+  }
+};
+const TOOLS={ 1:[costTool], 2:[posSizeTool,blowupTool], 3:[expectancyTool] };
+
 // initial paint before data arrives
+initTheme();
 renderMantras();
 renderAll();
 renderJournal();
